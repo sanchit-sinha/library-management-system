@@ -2,6 +2,17 @@
 #include "bits/stdc++.h"
 using namespace std;
 
+class Book {
+private:
+    string Title;
+    string Author;
+    string ISBN;
+    string Publication;
+public:
+    Book Book_Request(); // doubt
+    void show_due_date();
+};
+
 class User {
 private:
     string password;
@@ -43,16 +54,5 @@ class Librarian : public User {
 
     void view_all_users();
     void view_all_books();
-};
-
-class Book {
-private:
-    string Title;
-    string Author;
-    string ISBN;
-    string Publication;
-public:
-    Book Book_Request(); // doubt
-    void show_due_date();
 };
 
