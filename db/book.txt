@@ -1,0 +1,2 @@
+1 title1 author1 isbn1 pblication1 
+2 title2 author2 isbn2 pblication2 

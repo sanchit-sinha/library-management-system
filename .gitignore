@@ -33,3 +33,5 @@
 
 .vscode
 .editorconfig
+src/.cph
+src/a.out
