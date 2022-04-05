@@ -1,6 +1,9 @@
 //  contains the model of the database
+// should not work for simultaneous users 
+
 #include "bits/stdc++.h"
 using namespace std;
+#include "urls.cpp"
 
 class Book {
 public:
@@ -28,16 +31,18 @@ public:
         this->ID = ID;
         this->password = password;
     }
+    void view_issued_books();
+    string get_sno();
 };
 
 class Professor : public User {
-private:
+public:
     vector<Book> List_of_Books;
     long double Fine_amount;
-public:
-    Professor(string user_name, string user_password, string user_id) : User(Name, ID, user_password) {}
-    void view_issued_books();
     void calculate_fine();
+    Professor(string Name, string ID, string password, long double amt) : User(Name, ID, password) {
+        this->Fine_amount = amt;
+    }
 };
 
 class Student : public User {
@@ -45,14 +50,15 @@ private:
     vector<Book> List_of_Books;
     long double Fine_amount;
 public:
-    Student(string user_name, string user_password, string user_id) : User(Name, ID, user_password) {}
-    void view_issued_books();
+    Student(string Name, string ID, string password, long double amt) : User(Name, ID, password) {
+        this->Fine_amount = amt;
+    }
     void calculate_fine();
 };
 
 class Librarian : public User {
 public:
-    Librarian(string user_name, string user_password, string user_id) : User(Name, ID, user_password) {}
+    Librarian(string Name, string ID, string password) : User(Name, ID, password) {}
     void Add(Book);
     void Add(User);
 
@@ -71,19 +77,32 @@ public:
 
 class book_database {
 public:
-    map<int, Book> books;
+    map<string, Book*> books;
     void Add();
     void Update();
     void Delete();
     void Search();
     void Display(); // displays all the book
+    Book* get_book(string sno);
+
+    book_database() {
+        ifstream db_books;
+        db_books.open(DB_BOOK);
+        string book_sno, book_title, book_author, book_ISBN, book_publication;
+        while (db_books >> book_sno >> book_title >> book_author >> book_ISBN >> book_publication) {
+            Book* newBook = new Book(book_title, book_author, book_ISBN, book_publication);
+            books[book_sno] = newBook;
+        }
+        db_books.close();
+    }
 };
 
 class user_database {
 public:
-    map<int, User> users;
+    map<string, User*> users;
     void Add();
     void Update();
     void Delete();
     void Search();
+    User* get_user(string sno);
 };
