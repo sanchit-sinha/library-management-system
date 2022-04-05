@@ -72,3 +72,164 @@ void User::view_issued_books() {
 
     return;
 }
+
+// librarian
+void Librarian::Add(User* new_user) {
+    ifstream db_user;
+    db_user.open(DB_USER);
+
+    string sno, name, pwd, id, role;
+    while (db_user >> sno >> name >> id >> pwd >> role) {
+        if (name == new_user->Name || id == new_user->ID) {
+            cout << "User already exists !" << endl;
+            cout << endl;
+            return;
+        }
+    }
+
+    user_database* userdb = new user_database();
+    long long num = stoll(sno) + 1;
+    string new_sno = to_string(num);
+    userdb->users[new_sno] = new_user;
+
+    ofstream fout;
+    fout.open(DB_USER);
+    for (auto& user : userdb->users) {
+        fout << user.first << " ";
+        User* cur_user = user.second;
+        fout << cur_user->Name << " " << cur_user->ID << " " << cur_user->password << " " << cur_user->role << endl;
+    }
+    fout.close();
+
+    cout << "User successfully registered" << endl;
+    cout << endl;
+}
+
+void Librarian::Update(string user_name, string user_id) {
+    ifstream db_user;
+    db_user.open(DB_USER);
+
+    string sno, name, pwd, id, role;
+    string current_sno;
+    while (db_user >> sno >> name >> id >> pwd >> role) {
+        if (name == user_name && id == user_id) {
+            current_sno = sno;
+            break;
+        }
+    }
+
+    if (current_sno == "") {
+        cout << "There is no such user" << endl;
+        cout << endl;
+        return;
+    }
+    db_user.close();
+
+    user_database* userdb = new user_database();
+
+    cout << "------------------------------------" << endl;
+    cout << "The current details of the user is as : " << endl;
+    cout << "User Name : " << userdb->users[current_sno]->Name << endl;
+    cout << "User ID : " << userdb->users[current_sno]->ID << endl;
+    cout << "User Password : " << userdb->users[current_sno]->password << endl;
+    cout << "User Role : " << userdb->users[current_sno]->role << endl;
+    cout << "------------------------------------" << endl;
+    cout << endl;
+
+    cout << "Enter the new details of the user : " << endl;
+    cout << "Enter the new user name" << endl;
+    string new_username; cin >> new_username;
+
+    cout << "Enter the new user id " << endl;
+    string new_userid; cin >> new_userid;
+
+    cout << "Enter the new user password" << endl;
+    string new_userpassword; cin >> new_userpassword;
+
+    cout << "Enter the new user role" << endl;
+    cout << "Enter `a` for Student" << endl;
+    cout << "Enter `b` for Professor" << endl;
+    cout << "Enter `c` for Librarian" << endl;
+    string c, user_role;
+    string new_userrole; ;
+    cin >> c;
+    if (c == "a") new_userrole = "Student";
+    else if (c == "b") new_userrole = "Professor";
+    else if (c == "c") new_userrole = "Librarian";
+    else {
+        cout << "Please select from the given options" << endl;
+        cout << endl;
+        return;
+    }
+
+    userdb->users[current_sno] = new User(new_username, new_userid, new_userpassword, new_userrole);
+
+    // write to files
+    ofstream fout;
+    fout.open(DB_USER);
+    for (auto& user : userdb->users) {
+        fout << user.first << " ";
+        User* cur_user = user.second;
+        fout << cur_user->Name << " " << cur_user->ID << " " << cur_user->password << " " << cur_user->role << endl;
+    }
+    fout.close();
+
+    cout << "User successfully updated" << endl;
+    cout << endl;
+}
+
+void Librarian::Delete(string user_name, string user_id) {
+    ifstream db_user;
+    db_user.open(DB_USER);
+
+    string sno, name, pwd, id, role;
+    string current_sno;
+    while (db_user >> sno >> name >> id >> pwd >> role) {
+        if (name == user_name && id == user_id) {
+            current_sno = sno;
+            break;
+        }
+    }
+    db_user.close();
+
+    if (current_sno == "") {
+        cout << "There is no such user" << endl;
+        cout << endl;
+        return;
+    }
+
+    user_database* userdb = new user_database();
+
+    cout << "------------------------------------" << endl;
+    cout << "The current details of the user is as : " << endl;
+    cout << "User Name : " << userdb->users[current_sno]->Name << endl;
+    cout << "User ID : " << userdb->users[current_sno]->ID << endl;
+    cout << "User Password : " << userdb->users[current_sno]->password << endl;
+    cout << "User Role : " << userdb->users[current_sno]->role << endl;
+    cout << endl;
+
+    auto it = (userdb->users).find(current_sno);
+    if (it == (userdb->users).end()) {
+        cout << "There is no such user" << endl;
+        cout << endl;
+        return;
+    }
+    else {
+        (userdb->users).erase(it);
+    }
+
+
+    // write to files
+    ofstream fout;
+    fout.open(DB_USER);
+    for (auto& user : userdb->users) {
+        fout << user.first << " ";
+        User* cur_user = user.second;
+        fout << cur_user->Name << " " << cur_user->ID << " " << cur_user->password << " " << cur_user->role << endl;
+    }
+    fout.close();
+
+    cout << "User successfully deleted!" << endl;
+    cout << "------------------------------------" << endl;
+    cout << endl;
+}

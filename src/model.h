@@ -26,10 +26,12 @@ public:
     string Name;
     string ID;
     string password;
-    User(string Name, string ID, string password) {
+    string role;
+    User(string Name, string ID, string password, string role) {
         this->Name = Name;
         this->ID = ID;
         this->password = password;
+        this->role = role;
     }
     void view_issued_books();
     string get_sno();
@@ -40,7 +42,7 @@ public:
     vector<Book> List_of_Books;
     long double Fine_amount;
     void calculate_fine();
-    Professor(string Name, string ID, string password, long double amt) : User(Name, ID, password) {
+    Professor(string Name, string ID, string password, long double amt) : User(Name, ID, password, "Professor") {
         this->Fine_amount = amt;
     }
 };
@@ -50,7 +52,7 @@ private:
     vector<Book> List_of_Books;
     long double Fine_amount;
 public:
-    Student(string Name, string ID, string password, long double amt) : User(Name, ID, password) {
+    Student(string Name, string ID, string password, long double amt) : User(Name, ID, password, "Student") {
         this->Fine_amount = amt;
     }
     void calculate_fine();
@@ -58,15 +60,15 @@ public:
 
 class Librarian : public User {
 public:
-    Librarian(string Name, string ID, string password) : User(Name, ID, password) {}
+    Librarian(string Name, string ID, string password) : User(Name, ID, password, "Librarian") {}
     void Add(Book);
-    void Add(User);
+    void Add(User*);
 
     void Update(Book);
-    void Update(User);
+    void Update(string, string);
 
     void Delete(Book);
-    void Delete(User);
+    void Delete(string, string);
 
     void Search(Book);
     void Search(User);
@@ -105,4 +107,14 @@ public:
     void Delete();
     void Search();
     User* get_user(string sno);
+    user_database() {
+        ifstream db_user;
+        db_user.open(DB_USER);
+        string sno, name, pwd, id, role;
+        while (db_user >> sno >> name >> id >> pwd >> role) {
+            User* newUser = new User(name, id, pwd, role);
+            users[sno] = newUser;
+        }
+        db_user.close();
+    }
 };
