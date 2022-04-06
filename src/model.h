@@ -45,6 +45,7 @@ public:
     Professor(string Name, string ID, string password, long double amt) : User(Name, ID, password, "Professor") {
         this->Fine_amount = amt;
     }
+    void issue_book(Book*, string);
 };
 
 class Student : public User {
@@ -56,22 +57,23 @@ public:
         this->Fine_amount = amt;
     }
     void calculate_fine();
+    void issue_book(Book*, string);
 };
 
 class Librarian : public User {
 public:
     Librarian(string Name, string ID, string password) : User(Name, ID, password, "Librarian") {}
-    void Add(Book);
+    void Add(Book*);
     void Add(User*);
 
-    void Update(Book);
+    void Update(Book*);
     void Update(string, string);
 
-    void Delete(Book);
+    void Delete(Book*);
     void Delete(string, string);
 
-    void Search(Book);
-    void Search(User);
+    void Search(Book*); // get users corresponding to books
+    void Search(string, string); // get books corresponding to a user 
 
     void view_all_users();
     void view_all_books();
@@ -106,6 +108,7 @@ public:
     void Update();
     void Delete();
     void Search();
+    void Display();
     User* get_user(string sno);
     user_database() {
         ifstream db_user;

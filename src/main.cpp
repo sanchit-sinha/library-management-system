@@ -133,11 +133,25 @@ void student_page() {
     else if (op == 2) {
         user->view_issued_books();
     }
-    else if (op == 3) {
+    else if (op == 3 || op == 4) {
+        // to issue a book 
+        cout << "Enter the name of the book to issue" << endl;
+        string title; cin >> title;
 
-    }
-    else if (op == 4) {
+        cout << "Enter the name of the Author" << endl;
+        string author; cin >> author;
 
+        cout << "Enter the ISBN" << endl;
+        string isbn; cin >> isbn;
+
+        cout << "Enter the name of the Publication" << endl;
+        string publication; cin >> publication;
+
+        cout << "Enter the number of Books to be issued" << endl;
+        string num; cin >> num;
+
+        Book* newbook = new Book(title, author, isbn, publication);
+        user->issue_book(newbook, num);
     }
     else if (op == 5) {
         logout();
@@ -178,7 +192,7 @@ void librarian_page() {
 
     if (op == 1) {
         // add an user
-        cout << "--------Register user----------" << endl;
+        cout << "--------Add user----------" << endl;
         cout << "Enter the Name of the User" << endl;
         string user_name; cin >> user_name;
 
@@ -229,28 +243,101 @@ void librarian_page() {
         user->Delete(user_name, user_id);
     }
     else if (op == 4) {
+        // add a book
+        cout << "--------Add Book---------" << endl;
+        cout << "Enter the name of the book" << endl;
+        string title; cin >> title;
 
+        cout << "Enter the name of the Author" << endl;
+        string author; cin >> author;
+
+        cout << "Enter the ISBN" << endl;
+        string isbn; cin >> isbn;
+
+        cout << "Enter the name of the Publication" << endl;
+        string publication; cin >> publication;
+
+        Book* newbook = new Book(title, author, isbn, publication);
+        user->Add(newbook);
     }
     else if (op == 5) {
+        // update a book
+        cout << "--------Update Book---------" << endl;
+        cout << "Enter the name of the book" << endl;
+        string title; cin >> title;
 
+        cout << "Enter the name of the Author" << endl;
+        string author; cin >> author;
+
+        cout << "Enter the ISBN" << endl;
+        string isbn; cin >> isbn;
+
+        cout << "Enter the name of the Publication" << endl;
+        string publication; cin >> publication;
+
+        Book* newbook = new Book(title, author, isbn, publication);
+        user->Update(newbook);
     }
     else if (op == 6) {
+        // delete a book
+        cout << "--------Delete Book---------" << endl;
+        cout << "Enter the name of the book" << endl;
+        string title; cin >> title;
 
+        cout << "Enter the name of the Author" << endl;
+        string author; cin >> author;
+
+        cout << "Enter the ISBN" << endl;
+        string isbn; cin >> isbn;
+
+        cout << "Enter the name of the Publication" << endl;
+        string publication; cin >> publication;
+
+        Book* newbook = new Book(title, author, isbn, publication);
+
+        user->Delete(newbook);
     }
     else if (op == 7) {
+        // list of books
         book_database* bookdb = new book_database();
         bookdb->Display();
     }
     else if (op == 8) {
-
+        // list of users 
+        user_database* userdb = new user_database();
+        userdb->Display();
     }
     else if (op == 9) {
+        // list of books issued to a user 
+        cout << "--------get the list of Books corresponding to User---------" << endl;
+        cout << "Enter the Name of the User" << endl;
+        string user_name; cin >> user_name;
 
+        cout << "Enter the ID of the User" << endl;
+        string user_id; cin >> user_id;
+
+        user->Search(user_name, user_id);
     }
     else if (op == 10) {
+        // list of users corresponding to a book 
+        cout << "--------get the list of Users corresponding to a Book---------" << endl;
+        cout << "Enter the Title of the book" << endl;
+        string title; cin >> title;
 
+        cout << "Enter the name of the Author" << endl;
+        string author; cin >> author;
+
+        cout << "Enter the ISBN" << endl;
+        string isbn; cin >> isbn;
+
+        cout << "Enter the name of the Publication" << endl;
+        string publication; cin >> publication;
+
+        Book* newbook = new Book(title, author, isbn, publication);
+        user->Search(newbook);
     }
     else if (op == 11) {
+        // logout 
         logout();
     }
     librarian_page();
@@ -272,9 +359,10 @@ void professor_page() {
     cout << "Press " << 1 << " to see all the books" << endl;
     cout << "Press " << 2 << " to see your list of books" << endl;
     cout << "Press " << 3 << " to see if a book is available for issue or not" << endl;
-    cout << "Press " << 4 << " to calculate your fine amount" << endl;
-    cout << "Press " << 5 << " to clear your fine amount" << endl;
-    cout << "Press " << 6 << " to logout" << endl;
+    cout << "Press " << 4 << " to issue a book" << endl;
+    cout << "Press " << 5 << " to calculate your fine amount" << endl;
+    cout << "Press " << 6 << " to clear your fine amount" << endl;
+    cout << "Press " << 7 << " to logout" << endl;
     cout << "************************************" << endl;
     cout << endl;
 
@@ -284,22 +372,42 @@ void professor_page() {
     cin >> op;
 
     if (op == 1) {
+        // see all the list of books 
         book_database* bookdb = new book_database();
         bookdb->Display();
     }
     else if (op == 2) {
+        // to see all the issued books 
         user->view_issued_books();
     }
-    else if (op == 3) {
+    else if (op == 3 || op == 4) {
+        // to issue a book 
+        cout << "Enter the name of the book to issue" << endl;
+        string title; cin >> title;
 
-    }
-    else if (op == 4) {
+        cout << "Enter the name of the Author" << endl;
+        string author; cin >> author;
 
+        cout << "Enter the ISBN" << endl;
+        string isbn; cin >> isbn;
+
+        cout << "Enter the name of the Publication" << endl;
+        string publication; cin >> publication;
+
+        cout << "Enter the number of Books to be issued" << endl;
+        string num; cin >> num;
+
+
+        Book* newbook = new Book(title, author, isbn, publication);
+        user->issue_book(newbook, num);
     }
     else if (op == 5) {
 
     }
     else if (op == 6) {
+
+    }
+    else if (op == 7) {
         logout();
     }
 
