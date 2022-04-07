@@ -1,9 +1,9 @@
 1 Librarian 1 Librarian Librarian
+10 pn2 pi2 pp2 Professor
 2 Student 2 Student Student
 3 Professor 3 Professor Professor
 4 Sanchit 5 Sanchit Professor
-5 n1 id1 p1 Student
-6 n2 id2 p2 Professor
+6 n1 id1 p1 Professor
 7 ln1 li1 lp1 Librarian
 8 sn1 si1 sp1 Student
 9 pn1 pi1 pp1 Professor

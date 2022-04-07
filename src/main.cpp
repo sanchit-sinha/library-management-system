@@ -93,7 +93,7 @@ void login() {
     return;
 }
 
-// logout the user 
+// logout the user
 void logout() {
     ofstream fout;
     fout.open(DB_COOKIE);
@@ -125,8 +125,15 @@ void student_page() {
     cout << endl;
 
     Student* user = new Student(user_name, user_id, user_password, 0.0);
-    int op;
-    cin >> op;
+    string ops;
+    cin >> ops;
+
+    int op = 0;
+    for (int i = 0; i < (int)ops.size(); i++) {
+        if (ops[i] >= '0' && ops[i] <= '9') continue;
+        else op = -1;
+    }
+    if (op == 0) op = stoi(ops);
 
     pr();
     if (op == 1) {
@@ -137,7 +144,7 @@ void student_page() {
         user->view_issued_books();
     }
     else if (op == 3 || op == 4) {
-        // to issue a book 
+        // to issue a book
         cout << "Enter the name of the book to issue" << endl;
         string title; cin >> title;
 
@@ -157,7 +164,7 @@ void student_page() {
         user->issue_book(newbook, num);
     }
     else if (op == 5) {
-        // calculate your fine amount 
+        // calculate your fine amount
         user->calculate_fine();
     }
     else if (op == 6) {
@@ -199,8 +206,15 @@ void librarian_page() {
     cout << endl;
 
     Librarian* user = new Librarian(user_name, user_id, user_password);
-    int op;
-    cin >> op;
+    string ops;
+    cin >> ops;
+
+    int op = 0;
+    for (int i = 0; i < (int)ops.size(); i++) {
+        if (ops[i] >= '0' && ops[i] <= '9') continue;
+        else op = -1;
+    }
+    if (op == 0) op = stoi(ops);
 
     pr();
     if (op == 1) {
@@ -315,11 +329,11 @@ void librarian_page() {
         user->view_all_books();
     }
     else if (op == 8) {
-        // list of users 
+        // list of users
         user->view_all_users();
     }
     else if (op == 9) {
-        // list of books issued to a user 
+        // list of books issued to a user
         cout << "--------get the list of Books corresponding to User---------" << endl;
         cout << "Enter the Name of the User" << endl;
         string user_name; cin >> user_name;
@@ -330,7 +344,7 @@ void librarian_page() {
         user->Search(user_name, user_id);
     }
     else if (op == 10) {
-        // list of users corresponding to a book 
+        // list of users corresponding to a book
         cout << "--------get the list of Users corresponding to a Book---------" << endl;
         cout << "Enter the Title of the book" << endl;
         string title; cin >> title;
@@ -348,7 +362,7 @@ void librarian_page() {
         user->Search(newbook);
     }
     else if (op == 11) {
-        // clear the fine amount 
+        // clear the fine amount
         cout << "---Clear the fine amount---" << endl;
         cout << "Enter user details" << endl;
         cout << "Enter the user name : " << endl;
@@ -357,8 +371,16 @@ void librarian_page() {
         cout << "Enter the user ID : " << endl;
         string userid; cin >> userid;
 
-        cout << "Enter the user role : " << endl;
-        string userrole; cin >> userrole;
+        cout << "Enter the new user role" << endl;
+        cout << "Enter `a` for Student" << endl;
+        cout << "Enter `b` for Professor" << endl;
+        cout << "Enter `c` for Librarian" << endl;
+        string c, user_role;
+        string userrole; ;
+        cin >> c;
+        if (c == "a") userrole = "Student";
+        else if (c == "b") userrole = "Professor";
+        else userrole = "Librarian";
 
         ifstream db_user;
         db_user.open(DB_USER);
@@ -474,7 +496,7 @@ void librarian_page() {
                     cout << "The number of fine to be submitted is " << fine << endl;
 
                     cout << "Press `y` to clear the fine " << endl;
-                    string op;cin >> op;
+                    string op; cin >> op;
                     if (op == "y") {
                         ofstream fout;
                         fout.open(DB_USER_BOOK);
@@ -484,7 +506,7 @@ void librarian_page() {
                             break;
                         }
                         fout.close();
-                        cout << "Fine has been cleared successfully !" << endl;
+                        cout << "Fine has been cleared successfully and book has been returned!" << endl;
                     }
                     else {
                         cout << "Fine not cleared ! " << endl;
@@ -495,7 +517,7 @@ void librarian_page() {
 
     }
     else if (op == 12) {
-        // logout 
+        // logout
         logout();
     }
     else {
@@ -529,21 +551,28 @@ void professor_page() {
 
     Professor* user = new Professor(user_name, user_id, user_password, 0.0);
 
-    int op;
-    cin >> op;
+    string ops;
+    cin >> ops;
+
+    int op = 0;
+    for (int i = 0; i < (int)ops.size(); i++) {
+        if (ops[i] >= '0' && ops[i] <= '9') continue;
+        else op = -1;
+    }
+    if (op == 0) op = stoi(ops);
 
     pr();
     if (op == 1) {
-        // see all the list of books 
+        // see all the list of books
         book_database* bookdb = new book_database();
         bookdb->Display();
     }
     else if (op == 2) {
-        // to see all the issued books 
+        // to see all the issued books
         user->view_issued_books();
     }
     else if (op == 3 || op == 4) {
-        // to issue a book 
+        // to issue a book
         cout << "Enter the name of the book to issue" << endl;
         string title; cin >> title;
 
@@ -564,7 +593,7 @@ void professor_page() {
         user->issue_book(newbook, num);
     }
     else if (op == 5) {
-        // to calculate your fine amount 
+        // to calculate your fine amount
         user->calculate_fine();
     }
     else if (op == 6) {

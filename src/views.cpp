@@ -1,4 +1,4 @@
-// contains the function assossiated with the models 
+// contains the function assossiated with the models
 #include "bits/stdc++.h"
 #include "fstream"
 #include <ctime>
@@ -17,7 +17,7 @@ vector<long long> today() {
     long long mn = 1 + ltm->tm_mon;
     long long dy = ltm->tm_mday;
 
-    return { dy,mn,yr };
+    return { dy, mn, yr };
 }
 
 long long total_days(long long dd, long long mm, long long yyyy) {
@@ -27,7 +27,7 @@ long long total_days(long long dd, long long mm, long long yyyy) {
     return days;
 }
 
-// book database 
+// book database
 void book_database::Display() {
     cout << "------------------------Books----------------------------" << endl;
     if ((int)books.size()) {
@@ -56,7 +56,7 @@ Book* book_database::get_book(string sno) {
     return book;
 }
 
-// user database 
+// user database
 void user_database::Display() {
     cout << "------------------------Users----------------------------" << endl;
     if ((int)users.size()) {
@@ -86,7 +86,7 @@ User* user_database::get_user(string user_sno) {
 }
 
 
-// user 
+// user
 string User::get_sno() {
     string sno;
 
@@ -199,6 +199,7 @@ void Student::issue_book(Book* book, string num) {
     string yyyy = to_string(temp[2]);
     string mm = to_string(temp[1]);
     string dd = to_string(temp[0]);
+    numm = num;
 
     vector<string> cur;
     cur.push_back(suser);
@@ -239,14 +240,14 @@ void Student::calculate_fine() {
             long long cur_month = date_today[1];
             long long cur_year = date_today[2];
 
-            // at most 30 days 
+            // at most 30 days
             long long year_diff = cur_year - given_year;
             long long month_diff = cur_month - given_month;
             long long day_diff = cur_day - given_day;
 
             long long totday = total_days(cur_day, cur_month, cur_year) - total_days(given_day, given_month, given_year);
             if (totday > 30) {
-                due_books_sno.push_back({ sbook,totday });
+                due_books_sno.push_back({ sbook, totday });
                 fine += (2LL) * (totday - 30);
             }
         }
@@ -270,7 +271,7 @@ void Student::calculate_fine() {
 }
 
 
-// professor 
+// professor
 void Professor::issue_book(Book* book, string num) {
     ifstream db_book;
     db_book.open(DB_BOOK);
@@ -375,14 +376,14 @@ void Professor::calculate_fine() {
             long long cur_month = date_today[1];
             long long cur_year = date_today[2];
 
-            // at most 60 days 
+            // at most 60 days
             long long year_diff = cur_year - given_year;
             long long month_diff = cur_month - given_month;
             long long day_diff = cur_day - given_day;
 
             long long totday = total_days(cur_day, cur_month, cur_year) - total_days(given_day, given_month, given_year);
             if (totday > 60) {
-                due_books_sno.push_back({ sbook,totday });
+                due_books_sno.push_back({ sbook, totday });
                 fine += (5LL) * (totday - 60);
             }
         }

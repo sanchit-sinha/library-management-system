@@ -1,5 +1,5 @@
 //  contains the model of the database
-// should not work for simultaneous users 
+// should not work for simultaneous users
 
 #include "bits/stdc++.h"
 using namespace std;
@@ -73,7 +73,7 @@ public:
     void Delete(string, string);
 
     void Search(Book*); // get users corresponding to books
-    void Search(string, string); // get books corresponding to a user 
+    void Search(string, string); // get books corresponding to a user
 
     void view_all_users();
     void view_all_books();

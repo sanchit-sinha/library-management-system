@@ -32,3 +32,8 @@ Example: sno name id password role
 
 * `user_book.txt`  
 Example: sno_user sno_book day month year numBooks
+
+  
+## Things to take care of -
+* number of books should be entered as integer 
+* some of the users and books have been prefilled in the db folder   
