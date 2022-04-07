@@ -8,5 +8,5 @@ Example: sno title author isbn pblication
 Example: sno name id password role 
 
 * user_book.txt  
-Example: sno_user sno_book date_of_issue num_books_issued
+Example: sno_user sno_book day month year num_books_issued
 

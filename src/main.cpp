@@ -1,5 +1,6 @@
 #include "bits/stdc++.h"
 #include "fstream"
+#include <ctime>
 using namespace std;
 
 #include "model.h"
@@ -118,7 +119,8 @@ void student_page() {
     cout << "Press " << 2 << " to see the list of books you have" << endl;
     cout << "Press " << 3 << " to check if book is available for issue or not" << endl;
     cout << "Press " << 4 << " to issue a book" << endl;
-    cout << "Press " << 5 << " logout" << endl;
+    cout << "Press " << 5 << " to calculate your fine amount" << endl;
+    cout << "Press " << 6 << " logout" << endl;
     cout << "************************************" << endl;
     cout << endl;
 
@@ -126,6 +128,7 @@ void student_page() {
     int op;
     cin >> op;
 
+    pr();
     if (op == 1) {
         book_database* bookdb = new book_database();
         bookdb->Display();
@@ -154,12 +157,20 @@ void student_page() {
         user->issue_book(newbook, num);
     }
     else if (op == 5) {
+        // calculate your fine amount 
+        user->calculate_fine();
+    }
+    else if (op == 6) {
         logout();
     }
+    else {
+        cout << "Invalid input!" << endl;
+    }
+    pr();
+
     student_page();
     return;
 }
-
 
 void librarian_page() {
     ifstream fin;
@@ -182,7 +193,8 @@ void librarian_page() {
     cout << "Press " << 8 << " to get the list of users" << endl;
     cout << "Press " << 9 << " to see which book is issued to which user" << endl;
     cout << "Press " << 10 << " to check list of books issued to user" << endl;
-    cout << "Press " << 11 << " logout" << endl;
+    cout << "Press " << 11 << " to clear the fine amount" << endl;
+    cout << "Press " << 12 << " logout" << endl;
     cout << "************************************" << endl;
     cout << endl;
 
@@ -190,6 +202,7 @@ void librarian_page() {
     int op;
     cin >> op;
 
+    pr();
     if (op == 1) {
         // add an user
         cout << "--------Add user----------" << endl;
@@ -299,13 +312,11 @@ void librarian_page() {
     }
     else if (op == 7) {
         // list of books
-        book_database* bookdb = new book_database();
-        bookdb->Display();
+        user->view_all_books();
     }
     else if (op == 8) {
         // list of users 
-        user_database* userdb = new user_database();
-        userdb->Display();
+        user->view_all_users();
     }
     else if (op == 9) {
         // list of books issued to a user 
@@ -337,13 +348,164 @@ void librarian_page() {
         user->Search(newbook);
     }
     else if (op == 11) {
+        // clear the fine amount 
+        cout << "---Clear the fine amount---" << endl;
+        cout << "Enter user details" << endl;
+        cout << "Enter the user name : " << endl;
+        string username; cin >> username;
+
+        cout << "Enter the user ID : " << endl;
+        string userid; cin >> userid;
+
+        cout << "Enter the user role : " << endl;
+        string userrole; cin >> userrole;
+
+        ifstream db_user;
+        db_user.open(DB_USER);
+
+        string usno, uname, upwd, uid, urole;
+        string ucurrent_sno;
+        while (db_user >> usno >> uname >> uid >> upwd >> urole) {
+            if (uname == username && uid == userid && urole == userrole) {
+                ucurrent_sno = usno;
+                break;
+            }
+        }
+        db_user.close();
+
+        if (ucurrent_sno == "") {
+            cout << "There is no such user" << endl;
+            cout << endl;
+        }
+        else {
+            cout << endl;
+            cout << "Enter book details" << endl;
+            cout << "Enter the name of the book" << endl;
+            string title; cin >> title;
+
+            cout << "Enter the name of the Author" << endl;
+            string author; cin >> author;
+
+            cout << "Enter the ISBN" << endl;
+            string isbn; cin >> isbn;
+
+            cout << "Enter the name of the Publication" << endl;
+            string publication; cin >> publication;
+
+            Book* book = new Book(title, author, isbn, publication);
+
+            ifstream db_book;
+            db_book.open(DB_BOOK);
+
+            string bsno, btitle, bauthor, bisbn, bpublication;
+            string bcurrent_sno;
+            while (db_book >> bsno >> btitle >> bauthor >> bisbn >> bpublication) {
+                if (btitle == book->Title && bauthor == book->Author && bisbn == book->ISBN && bpublication == book->Publication) {
+                    bcurrent_sno = bsno;
+                }
+            }
+            db_book.close();
+
+            if (bcurrent_sno == "") {
+                cout << "There is no such Book" << endl;
+                cout << endl;
+            }
+            else {
+                book_database* bookdb = new book_database();
+                ifstream db_user_book;
+                db_user_book.open(DB_USER_BOOK);
+                string suser, sbook, day, month, year, numm;
+
+                string cuser = ucurrent_sno;
+                string cbook = bcurrent_sno;
+
+                cout << cuser << " " << cbook << endl;
+
+                string dd, mm, yyyy, num;
+                vector<vector<string>> store;
+                bool got = 0;
+                while (db_user_book >> suser >> sbook >> day >> month >> year >> numm) {
+                    if (suser == cuser && sbook == cbook) {
+                        dd = day;
+                        mm = month;
+                        yyyy = year;
+                        num = numm;
+                        got = 1;
+                    }
+                    else {
+                        cout << suser << " " << sbook << endl;
+                        vector<string> cur;
+                        cur.push_back(suser);
+                        cur.push_back(sbook);
+                        cur.push_back(day);
+                        cur.push_back(month);
+                        cur.push_back(year);
+                        cur.push_back(numm);
+
+                        store.push_back(cur);
+                    }
+                }
+                db_user_book.close();
+
+                if (!got) {
+                    cout << "Book has not been issued!" << endl;
+                }
+                else {
+                    long double fine = 0.0;
+                    long long given_day = stoll(dd);
+                    long long given_month = stoll(mm);
+                    long long given_year = stoll(yyyy);
+
+                    vector<long long> date_today = today();
+                    long long cur_day = date_today[0];
+                    long long cur_month = date_today[1];
+                    long long cur_year = date_today[2];
+
+                    long long year_diff = cur_year - given_year;
+                    long long month_diff = cur_month - given_month;
+                    long long day_diff = cur_day - given_day;
+
+                    long long totday = total_days(cur_day, cur_month, cur_year) - total_days(given_day, given_month, given_year);
+                    if (urole == "Student" && totday > 30) fine += (2LL) * (totday - 30);
+                    if (urole == "Professor" && totday > 60) fine += (5LL) * (totday - 60);
+
+                    cout << "To clear the fine for this book and user :: " << endl;
+                    cout << "The number of books that need to be returned is " << num << endl;
+                    cout << "The number of fine to be submitted is " << fine << endl;
+
+                    cout << "Press `y` to clear the fine " << endl;
+                    string op;cin >> op;
+                    if (op == "y") {
+                        ofstream fout;
+                        fout.open(DB_USER_BOOK);
+                        for (auto& x : store) {
+                            for (auto& y : x) fout << y << " ";
+                            fout << endl;
+                            break;
+                        }
+                        fout.close();
+                        cout << "Fine has been cleared successfully !" << endl;
+                    }
+                    else {
+                        cout << "Fine not cleared ! " << endl;
+                    }
+                }
+            }
+        }
+
+    }
+    else if (op == 12) {
         // logout 
         logout();
     }
+    else {
+        cout << "Invalid input!" << endl;
+    }
+    pr();
+
     librarian_page();
     return;
 }
-
 
 void professor_page() {
     ifstream fin;
@@ -355,15 +517,14 @@ void professor_page() {
     assert(s_no != "");
     assert(role == "Professor");
 
-    cout << "************COMMANDS*****************" << endl;
+    cout << "**************COMMANDS***************" << endl;
     cout << "Press " << 1 << " to see all the books" << endl;
     cout << "Press " << 2 << " to see your list of books" << endl;
     cout << "Press " << 3 << " to see if a book is available for issue or not" << endl;
     cout << "Press " << 4 << " to issue a book" << endl;
     cout << "Press " << 5 << " to calculate your fine amount" << endl;
-    cout << "Press " << 6 << " to clear your fine amount" << endl;
-    cout << "Press " << 7 << " to logout" << endl;
-    cout << "************************************" << endl;
+    cout << "Press " << 6 << " to logout" << endl;
+    cout << "*************************************" << endl;
     cout << endl;
 
     Professor* user = new Professor(user_name, user_id, user_password, 0.0);
@@ -371,6 +532,7 @@ void professor_page() {
     int op;
     cin >> op;
 
+    pr();
     if (op == 1) {
         // see all the list of books 
         book_database* bookdb = new book_database();
@@ -402,14 +564,16 @@ void professor_page() {
         user->issue_book(newbook, num);
     }
     else if (op == 5) {
-
+        // to calculate your fine amount 
+        user->calculate_fine();
     }
     else if (op == 6) {
-
-    }
-    else if (op == 7) {
         logout();
     }
+    else {
+        cout << "Invalid input!" << endl;
+    }
+    pr();
 
     professor_page();
     return;
@@ -423,14 +587,6 @@ int main() {
     cin.tie(0);
     cout.tie(0);
     cout << fixed << setprecision(20);
-
-    // db_users.open(DB_USER);
-    // string user_sno, user_name, user_id, user_password, user_role;
-    // while (db_users >> user_sno >> user_name >> user_id >> user_password >> user_role) {
-    //     User* new_user = new User(user_name, user_id, user_password);
-    //     users[user_sno] = new_user;
-    // }
-    // db_users.close();
 
     enter_library();
 }

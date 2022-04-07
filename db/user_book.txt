@@ -1,7 +1,4 @@
-3 1 date num_books 
-2 1 date num_books 
-2 2 date num_books 
-3 4 dd-mm-yyyy 56 
-2 4 dd-mm-yyyy 3 
-2 5 as-asas-asasa 5 
-3 2 asasasadate 2312324 
+9 6 7 4 2022 100 
+9 7 7 4 2022 200 
+9 8 7 4 2022 300 
+8 6 7 4 2022 300 

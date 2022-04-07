@@ -4,13 +4,38 @@
 #include <ctime>
 using namespace std;
 
+void pr() {
+    cout << "###########---------------------------###########" << endl;
+    cout << endl;
+}
+
+vector<long long> today() {
+    time_t now = time(0);
+    tm* ltm = localtime(&now);
+
+    long long yr = 1900 + ltm->tm_year;
+    long long mn = 1 + ltm->tm_mon;
+    long long dy = ltm->tm_mday;
+
+    return { dy,mn,yr };
+}
+
+long long total_days(long long dd, long long mm, long long yyyy) {
+    long long days = dd;
+    days += (yyyy * 12 * 30);
+    days += (mm * 30);
+    return days;
+}
+
 // book database 
 void book_database::Display() {
     cout << "------------------------Books----------------------------" << endl;
-    cout << "Title" << " " << "Author" << " " << "ISBN" << " " << "Publication" << endl << endl;
-    for (auto& book : books) {
-        Book* x = book.second;
-        cout << x->Title << " " << x->Author << " " << x->ISBN << " " << x->Publication << endl;
+    if ((int)books.size()) {
+        cout << "Title" << " " << "Author" << " " << "ISBN" << " " << "Publication" << endl << endl;
+        for (auto& book : books) {
+            Book* x = book.second;
+            cout << x->Title << " " << x->Author << " " << x->ISBN << " " << x->Publication << endl;
+        }
     }
     cout << "---------------------------------------------------------" << endl;
     cout << endl;
@@ -34,10 +59,12 @@ Book* book_database::get_book(string sno) {
 // user database 
 void user_database::Display() {
     cout << "------------------------Users----------------------------" << endl;
-    cout << "[Name" << " " << "ID" << " " << "Password" << " " << "Role]" << endl << endl;
-    for (auto& user : users) {
-        User* x = user.second;
-        cout << x->Name << " " << x->ID << " " << x->password << " " << x->role << endl;
+    if ((int)users.size()) {
+        cout << "[Name" << " " << "ID" << " " << "Password" << " " << "Role]" << endl << endl;
+        for (auto& user : users) {
+            User* x = user.second;
+            cout << x->Name << " " << x->ID << " " << x->password << " " << x->role << endl;
+        }
     }
     cout << "---------------------------------------------------------" << endl;
     cout << endl;
@@ -77,18 +104,20 @@ string User::get_sno() {
 }
 
 void User::view_issued_books() {
-    string user_sno = this->get_sno();
+    string user_sno = get_sno();
+
+    string sno_user, sno_book, day, month, year, num;
+    vector<string> books_sno;
 
     ifstream db_user_book;
     db_user_book.open(DB_USER_BOOK);
-
-    string sno_user, sno_book, date, num;
-    vector<string> books_sno;
-    while (db_user_book >> sno_user >> sno_book >> date >> num) {
+    while (db_user_book >> sno_user >> sno_book >> day >> month >> year >> num) {
         if (sno_user == user_sno) {
             books_sno.push_back(sno_book);
+            cout << sno_book << endl;
         }
     }
+    db_user_book.close();
 
     book_database* bookdb = new book_database();
     cout << "------------------------Books Issued----------------------------" << endl;
@@ -101,7 +130,6 @@ void User::view_issued_books() {
 
     return;
 }
-#include <ctime>
 
 // student
 void Student::issue_book(Book* book, string num) {
@@ -134,13 +162,13 @@ void Student::issue_book(Book* book, string num) {
 
     ifstream db_user_book;
     db_user_book.open(DB_USER_BOOK);
-    string suser, sbook, date, numm;
+    string suser, sbook, day, month, year, numm;
 
     string cuser = get_sno();
     string cbook = current_sno;
 
     vector<vector<string>> store;
-    while (db_user_book >> suser >> sbook >> date >> numm) {
+    while (db_user_book >> suser >> sbook >> day >> month >> year >> numm) {
         if (suser == cuser && sbook == cbook) {
             cout << "Book already issued! Kindly issue another book." << endl;
             return;
@@ -148,7 +176,9 @@ void Student::issue_book(Book* book, string num) {
         vector<string> cur;
         cur.push_back(suser);
         cur.push_back(sbook);
-        cur.push_back(date);
+        cur.push_back(day);
+        cur.push_back(month);
+        cur.push_back(year);
         cur.push_back(numm);
 
         store.push_back(cur);
@@ -164,18 +194,22 @@ void Student::issue_book(Book* book, string num) {
 
     suser = cuser;
     sbook = current_sno;
-    cout << "Enter current date and time in the following format DD-MM-YYYY" << endl;
-    cin >> date;
-    numm = num;
+
+    vector<long long> temp = today();
+    string yyyy = to_string(temp[2]);
+    string mm = to_string(temp[1]);
+    string dd = to_string(temp[0]);
 
     vector<string> cur;
     cur.push_back(suser);
     cur.push_back(sbook);
-    cur.push_back(date);
+    cur.push_back(dd);
+    cur.push_back(mm);
+    cur.push_back(yyyy);
     cur.push_back(numm);
     store.push_back(cur);
 
-    fstream fout;
+    ofstream fout;
     fout.open(DB_USER_BOOK);
     for (auto& x : store) {
         for (auto& y : x) fout << y << " ";
@@ -185,6 +219,56 @@ void Student::issue_book(Book* book, string num) {
 
     cout << "The book has been successfully issued" << endl;
 }
+void Student::calculate_fine() {
+    string user_sno = get_sno();
+
+    ifstream db_user_book;
+    db_user_book.open(DB_USER_BOOK);
+    string suser, sbook, dd, mm, yyyy, num;
+
+    long double fine = 0.0;
+    vector<pair<string, long long >> due_books_sno;
+    while (db_user_book >> suser >> sbook >> dd >> mm >> yyyy >> num) {
+        if (suser == user_sno) {
+            long long given_day = stoll(dd);
+            long long given_month = stoll(mm);
+            long long given_year = stoll(yyyy);
+
+            vector<long long> date_today = today();
+            long long cur_day = date_today[0];
+            long long cur_month = date_today[1];
+            long long cur_year = date_today[2];
+
+            // at most 30 days 
+            long long year_diff = cur_year - given_year;
+            long long month_diff = cur_month - given_month;
+            long long day_diff = cur_day - given_day;
+
+            long long totday = total_days(cur_day, cur_month, cur_year) - total_days(given_day, given_month, given_year);
+            if (totday > 30) {
+                due_books_sno.push_back({ sbook,totday });
+                fine += (2LL) * (totday - 30);
+            }
+        }
+    }
+
+    book_database* bookdb = new book_database();
+
+    if ((int)due_books_sno.size()) {
+        cout << "List of books on which fine is imposed : " << endl;
+        cout << "[Title" << " " << "Author" << " " << "ISBN" << " " << "Publication" << " " << "Total-days-due" << "]";
+        cout << endl;
+
+        for (auto& p : due_books_sno) {
+            Book* cur_book = bookdb->get_book(p.first);
+            cout << cur_book->Title << " " << cur_book->Author << " " << cur_book->ISBN << " " << cur_book->Publication << "  ";
+            cout << to_string(p.second) << endl;
+        }
+    }
+    Fine_amount = fine;
+    cout << "Total fine is :: " << fine << endl;
+}
+
 
 // professor 
 void Professor::issue_book(Book* book, string num) {
@@ -210,21 +294,26 @@ void Professor::issue_book(Book* book, string num) {
 
     ifstream db_user_book;
     db_user_book.open(DB_USER_BOOK);
-    string suser, sbook, date, numm;
+    string suser, sbook, day, month, year, numm;
 
     string cuser = get_sno();
     string cbook = current_sno;
 
     vector<vector<string>> store;
-    while (db_user_book >> suser >> sbook >> date >> numm) {
+    while (db_user_book >> suser >> sbook >> day >> month >> year >> numm) {
         if (suser == cuser && sbook == cbook) {
+            cout << " func " << cuser << " " << cbook << endl;
+            cout << " pres " << suser << " " << sbook << endl;
+
             cout << "Book already issued! Kindly issue another book." << endl;
             return;
         }
         vector<string> cur;
         cur.push_back(suser);
         cur.push_back(sbook);
-        cur.push_back(date);
+        cur.push_back(day);
+        cur.push_back(month);
+        cur.push_back(year);
         cur.push_back(numm);
 
         store.push_back(cur);
@@ -238,21 +327,25 @@ void Professor::issue_book(Book* book, string num) {
         return;
     }
 
-
     suser = cuser;
     sbook = current_sno;
-    cout << "Enter current date and time in the following format DD-MM-YYYY" << endl;
-    cin >> date;
+
+    vector<long long> temp = today();
+    string yyyy = to_string(temp[2]);
+    string mm = to_string(temp[1]);
+    string dd = to_string(temp[0]);
     numm = num;
 
     vector<string> cur;
     cur.push_back(suser);
     cur.push_back(sbook);
-    cur.push_back(date);
+    cur.push_back(dd);
+    cur.push_back(mm);
+    cur.push_back(yyyy);
     cur.push_back(numm);
     store.push_back(cur);
 
-    fstream fout;
+    ofstream fout;
     fout.open(DB_USER_BOOK);
     for (auto& x : store) {
         for (auto& y : x) fout << y << " ";
@@ -262,8 +355,54 @@ void Professor::issue_book(Book* book, string num) {
 
     cout << "The book has been successfully issued" << endl;
 }
+void Professor::calculate_fine() {
+    string user_sno = get_sno();
 
+    ifstream db_user_book;
+    db_user_book.open(DB_USER_BOOK);
+    string suser, sbook, dd, mm, yyyy, num;
 
+    long double fine = 0.0;
+    vector<pair<string, long long >> due_books_sno;
+    while (db_user_book >> suser >> sbook >> dd >> mm >> yyyy >> num) {
+        if (suser == user_sno) {
+            long long given_day = stoll(dd);
+            long long given_month = stoll(mm);
+            long long given_year = stoll(yyyy);
+
+            vector<long long> date_today = today();
+            long long cur_day = date_today[0];
+            long long cur_month = date_today[1];
+            long long cur_year = date_today[2];
+
+            // at most 60 days 
+            long long year_diff = cur_year - given_year;
+            long long month_diff = cur_month - given_month;
+            long long day_diff = cur_day - given_day;
+
+            long long totday = total_days(cur_day, cur_month, cur_year) - total_days(given_day, given_month, given_year);
+            if (totday > 60) {
+                due_books_sno.push_back({ sbook,totday });
+                fine += (5LL) * (totday - 60);
+            }
+        }
+    }
+
+    book_database* bookdb = new book_database();
+    if ((int)due_books_sno.size()) {
+        cout << "List of books on which fine is imposed : " << endl;
+        cout << "[Title" << " " << "Author" << " " << "ISBN" << " " << "Publication" << " " << "Total-days-due" << "]";
+        cout << endl;
+
+        for (auto& p : due_books_sno) {
+            Book* cur_book = bookdb->get_book(p.first);
+            cout << cur_book->Title << " " << cur_book->Author << " " << cur_book->ISBN << " " << cur_book->Publication << "  ";
+            cout << to_string(p.second) << endl;
+        }
+    }
+    Fine_amount = fine;
+    cout << "Total fine is :: " << fine << endl;
+}
 
 // librarian
 void Librarian::Add(User* new_user) {
@@ -449,12 +588,12 @@ void Librarian::Search(string user_name, string user_id) {
     book_database* bookdb = new book_database();
     ifstream db_user_book;
     db_user_book.open(DB_USER_BOOK);
-    string suser, sbook, date, num;
+    string suser, sbook, day, month, year, num;
 
     cout << endl;
     cout << " List of Books: " << endl;
     cout << "[Title" << " " << "Author" << " " << "ISBN" << " " << "Publication]" << endl << endl;
-    while (db_user_book >> suser >> sbook >> date >> num) {
+    while (db_user_book >> suser >> sbook >> day >> month >> year >> num) {
         if (suser == current_sno) {
             Book* curbook = bookdb->get_book(sbook);
             cout << curbook->Title << " " << curbook->Author << " " << curbook->ISBN << " " << curbook->Publication << endl;
@@ -633,12 +772,12 @@ void Librarian::Search(Book* book) {
     user_database* userdb = new user_database();
     ifstream db_user_book;
     db_user_book.open(DB_USER_BOOK);
-    string suser, sbook, date, num;
+    string suser, sbook, day, month, year, num;
 
     cout << endl;
     cout << " List of Users: " << endl;
     cout << "Name" << " " << "ID" << " " << "Password" << " " << "Role" << endl << endl;
-    while (db_user_book >> suser >> sbook >> date >> num) {
+    while (db_user_book >> suser >> sbook >> day >> month >> year >> num) {
         if (sbook == current_sno) {
             User* curuser = userdb->get_user(suser);
             cout << curuser->Name << " " << curuser->ID << " " << curuser->password << " " << curuser->role << endl;
@@ -648,4 +787,14 @@ void Librarian::Search(Book* book) {
 
     cout << "------------------------------------" << endl;
     cout << endl;
+}
+
+void Librarian::view_all_books() {
+    book_database* bookdb = new book_database();
+    bookdb->Display();
+}
+
+void Librarian::view_all_users() {
+    user_database* userdb = new user_database();
+    userdb->Display();
 }
