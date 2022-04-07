@@ -29,7 +29,11 @@ void enter_library() {
     fin.close();
 
     if (s_no == "") {
-        cout << "Welcome to library" << endl;
+        pr();
+        cout << "Welcome to the library!" << endl;
+        cout << "Kindly go through the Readme to get an idea of the application" << endl;
+        cout << "More specically have a look at the 'Things to take care of` section in the readme !" << endl << endl;
+        pr();
         login();
     }
     else {
@@ -58,7 +62,7 @@ void enter_library() {
 
 // login in to the system
 void login() {
-    cout << "Welcome to Library Management System !" << endl;
+    cout << "Welcome to the Library!. Kindly login ! " << endl;
     cout << "*****************************" << endl;
 
     string username, password;
@@ -116,7 +120,7 @@ void student_page() {
 
     cout << "************COMMANDS*****************" << endl;
     cout << "Press " << 1 << " to see all the books" << endl;
-    cout << "Press " << 2 << " to see the list of books you have" << endl;
+    cout << "Press " << 2 << " to see the list of books you have or to view due date of books" << endl;
     cout << "Press " << 3 << " to check if book is available for issue or not" << endl;
     cout << "Press " << 4 << " to issue a book" << endl;
     cout << "Press " << 5 << " to calculate your fine amount" << endl;
@@ -541,7 +545,7 @@ void professor_page() {
 
     cout << "**************COMMANDS***************" << endl;
     cout << "Press " << 1 << " to see all the books" << endl;
-    cout << "Press " << 2 << " to see your list of books" << endl;
+    cout << "Press " << 2 << " to see your list of books or to view due date of issued books" << endl;
     cout << "Press " << 3 << " to see if a book is available for issue or not" << endl;
     cout << "Press " << 4 << " to issue a book" << endl;
     cout << "Press " << 5 << " to calculate your fine amount" << endl;

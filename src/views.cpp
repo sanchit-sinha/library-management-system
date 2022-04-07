@@ -107,27 +107,28 @@ void User::view_issued_books() {
     string user_sno = get_sno();
 
     string sno_user, sno_book, day, month, year, num;
-    vector<string> books_sno;
 
     ifstream db_user_book;
     db_user_book.open(DB_USER_BOOK);
+    book_database* bookdb = new book_database();
+    user_database* userdb = new user_database();
+
+    string x = "30";
+    string user_role = userdb->get_user(user_sno)->role;
+    if (user_role != "Student") x = "60";
+
+    cout << "------------------------Books Issued----------------------------" << endl;
     while (db_user_book >> sno_user >> sno_book >> day >> month >> year >> num) {
         if (sno_user == user_sno) {
-            books_sno.push_back(sno_book);
-            cout << sno_book << endl;
+            Book* this_book = bookdb->get_book(sno_book);
+            cout << this_book->Title << " " << this_book->Author << " " << this_book->ISBN << " " << this_book->Publication << " ";
+            cout << " [Due date : " << x << " days from " << day << "-" << month << "-" << year << " ]" << endl;
+
         }
     }
     db_user_book.close();
 
-    book_database* bookdb = new book_database();
-    cout << "------------------------Books Issued----------------------------" << endl;
-    for (auto& sno : books_sno) {
-        Book* this_book = bookdb->books[sno];
-        cout << this_book->Title << " " << this_book->Author << " " << this_book->ISBN << " " << this_book->Publication << endl;
-    }
     cout << "--------------------------------------------------------------" << endl;
-    cout << endl;
-
     return;
 }
 
@@ -218,6 +219,7 @@ void Student::issue_book(Book* book, string num) {
     }
     fout.close();
 
+    cout << "The due date is 30 days from today" << endl;
     cout << "The book has been successfully issued" << endl;
 }
 void Student::calculate_fine() {
@@ -353,7 +355,7 @@ void Professor::issue_book(Book* book, string num) {
         fout << endl;
     }
     fout.close();
-
+    cout << "The due date is 60 days from today" << endl;
     cout << "The book has been successfully issued" << endl;
 }
 void Professor::calculate_fine() {
